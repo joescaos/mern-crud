@@ -20,6 +20,16 @@ eval("\n\nObject.defineProperty(exports, \"__esModule\", ({\n  value: true\n}));
 
 /***/ }),
 
+/***/ "./server/controllers/auth.controller.js":
+/*!***********************************************!*\
+  !*** ./server/controllers/auth.controller.js ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+eval("\n\nObject.defineProperty(exports, \"__esModule\", ({\n  value: true\n}));\nexports.default = void 0;\n\nvar _user = _interopRequireDefault(__webpack_require__(/*! ../models/user.model */ \"./server/models/user.model.js\"));\n\nvar _jsonwebtoken = _interopRequireDefault(__webpack_require__(/*! jsonwebtoken */ \"jsonwebtoken\"));\n\nvar _expressJwt = _interopRequireDefault(__webpack_require__(/*! express-jwt */ \"express-jwt\"));\n\nvar _config = _interopRequireDefault(__webpack_require__(/*! ../../config/config */ \"./config/config.js\"));\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nconst signin = async (req, res) => {\n  try {\n    let user = await _user.default.findOne({\n      email: req.body.email\n    });\n    if (!user) return res.status(\"401\").json({\n      error: \"User not found\"\n    });\n\n    if (!user.authenticate(req.body.passwrod)) {\n      return res.status(\"401\").send({\n        error: \"Email and Password does not match\"\n      });\n    }\n\n    const token = _jsonwebtoken.default.sign({\n      _id: user._id\n    }, _config.default.jwtSecret);\n\n    res.cookie(\"t\", token, {\n      expire: new Date() + 999\n    });\n    return res.json({\n      token,\n      user: {\n        _id: user._id,\n        name: user.name,\n        email: user.email\n      }\n    });\n  } catch (err) {\n    return res.status(\"401\").json({\n      error: \"Could not sign in\"\n    });\n  }\n};\n\nconst signout = (req, res) => {\n  res.clearCookie(\"t\");\n  return res.status(\"200\").json({\n    message: \"signed out\"\n  });\n};\n\nconst requireSignin = (0, _expressJwt.default)({\n  secret: _config.default.jwtSecret,\n  userProperty: \"auth\",\n  algorithms: ['RS256']\n});\n\nconst hasAuthorization = (req, res, next) => {\n  const authorized = req.profile && req.auth && req.profile._id == req.auth._id;\n\n  if (!authorized) {\n    return res.status(\"403\").json({\n      error: \"User is not authorized\"\n    });\n  }\n\n  next();\n};\n\nvar _default = {\n  signin,\n  signout,\n  requireSignin,\n  hasAuthorization\n};\nexports.default = _default;\n\n//# sourceURL=webpack://mern-crud/./server/controllers/auth.controller.js?");
+
+/***/ }),
+
 /***/ "./server/controllers/user.controller.js":
 /*!***********************************************!*\
   !*** ./server/controllers/user.controller.js ***!
@@ -36,7 +46,7 @@ eval("\n\nObject.defineProperty(exports, \"__esModule\", ({\n  value: true\n}));
   \***************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-eval("\n\nObject.defineProperty(exports, \"__esModule\", ({\n  value: true\n}));\nexports.default = void 0;\n\nvar _express = _interopRequireDefault(__webpack_require__(/*! express */ \"express\"));\n\nvar _bodyParser = _interopRequireDefault(__webpack_require__(/*! body-parser */ \"body-parser\"));\n\nvar _cookieParser = _interopRequireDefault(__webpack_require__(/*! cookie-parser */ \"cookie-parser\"));\n\nvar _compression = _interopRequireDefault(__webpack_require__(/*! compression */ \"compression\"));\n\nvar _cors = _interopRequireDefault(__webpack_require__(/*! cors */ \"cors\"));\n\nvar _helmet = _interopRequireDefault(__webpack_require__(/*! helmet */ \"helmet\"));\n\nvar _template = _interopRequireDefault(__webpack_require__(/*! ./../template */ \"./template.js\"));\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nconst app = (0, _express.default)();\n/*... configure express ... */\n\napp.use(_bodyParser.default.json());\napp.use(_bodyParser.default.urlencoded({\n  extended: true\n}));\napp.use((0, _cookieParser.default)());\napp.use((0, _compression.default)());\napp.use((0, _helmet.default)());\napp.use((0, _cors.default)());\napp.get('/', (req, res) => {\n  res.status(200).send((0, _template.default)());\n});\nvar _default = app;\nexports.default = _default;\n\n//# sourceURL=webpack://mern-crud/./server/express.js?");
+eval("\n\nObject.defineProperty(exports, \"__esModule\", ({\n  value: true\n}));\nexports.default = void 0;\n\nvar _express = _interopRequireDefault(__webpack_require__(/*! express */ \"express\"));\n\nvar _bodyParser = _interopRequireDefault(__webpack_require__(/*! body-parser */ \"body-parser\"));\n\nvar _cookieParser = _interopRequireDefault(__webpack_require__(/*! cookie-parser */ \"cookie-parser\"));\n\nvar _compression = _interopRequireDefault(__webpack_require__(/*! compression */ \"compression\"));\n\nvar _cors = _interopRequireDefault(__webpack_require__(/*! cors */ \"cors\"));\n\nvar _helmet = _interopRequireDefault(__webpack_require__(/*! helmet */ \"helmet\"));\n\nvar _template = _interopRequireDefault(__webpack_require__(/*! ./../template */ \"./template.js\"));\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nconst app = (0, _express.default)();\n/*... configure express ... */\n\napp.use(_bodyParser.default.json());\napp.use(_bodyParser.default.urlencoded({\n  extended: true\n}));\napp.use((0, _cookieParser.default)());\napp.use((0, _compression.default)());\napp.use((0, _helmet.default)());\napp.use((0, _cors.default)());\napp.get('/', (req, res) => {\n  res.status(200).send((0, _template.default)());\n});\napp.use((err, req, res, next) => {\n  if (err.name === 'UnathorizedError') {\n    res.status('401').json({\n      \"error\": err.name + \": \" + err.message\n    });\n  } else if (err) {\n    res.status(400).json({\n      \"error\": err.name + \": \" + err.message\n    });\n    console.log(err);\n  }\n});\nvar _default = app;\nexports.default = _default;\n\n//# sourceURL=webpack://mern-crud/./server/express.js?");
 
 /***/ }),
 
@@ -70,13 +80,23 @@ eval("\n\nObject.defineProperty(exports, \"__esModule\", ({\n  value: true\n}));
 
 /***/ }),
 
+/***/ "./server/routes/auth.routes.js":
+/*!**************************************!*\
+  !*** ./server/routes/auth.routes.js ***!
+  \**************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+eval("\n\nObject.defineProperty(exports, \"__esModule\", ({\n  value: true\n}));\nexports.default = void 0;\n\nvar _express = _interopRequireDefault(__webpack_require__(/*! express */ \"express\"));\n\nvar _auth = _interopRequireDefault(__webpack_require__(/*! ../controllers/auth.controller */ \"./server/controllers/auth.controller.js\"));\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nconst router = _express.default.Router();\n\nrouter.route('/auth/signin').post(_auth.default.signin);\nrouter.route('/auth/signout').get(_auth.default.signout);\nvar _default = router;\nexports.default = _default;\n\n//# sourceURL=webpack://mern-crud/./server/routes/auth.routes.js?");
+
+/***/ }),
+
 /***/ "./server/routes/user.routes.js":
 /*!**************************************!*\
   !*** ./server/routes/user.routes.js ***!
   \**************************************/
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-eval("\n\nObject.defineProperty(exports, \"__esModule\", ({\n  value: true\n}));\nexports.default = void 0;\n\nvar _express = _interopRequireDefault(__webpack_require__(/*! express */ \"express\"));\n\nvar _user = _interopRequireDefault(__webpack_require__(/*! ../controllers/user.controller */ \"./server/controllers/user.controller.js\"));\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nconst router = _express.default.Router();\n\nrouter.route('/api/users').get(_user.default.list).post(_user.default.create);\nrouter.route('api/users/:userId').get(_user.default.read).put(_user.default.update).delete(_user.default.remove);\nrouter.param('userId', _user.default.userByID);\nvar _default = router;\nexports.default = _default;\n\n//# sourceURL=webpack://mern-crud/./server/routes/user.routes.js?");
+eval("\n\nObject.defineProperty(exports, \"__esModule\", ({\n  value: true\n}));\nexports.default = void 0;\n\nvar _express = _interopRequireDefault(__webpack_require__(/*! express */ \"express\"));\n\nvar _user = _interopRequireDefault(__webpack_require__(/*! ../controllers/user.controller */ \"./server/controllers/user.controller.js\"));\n\nvar _auth = _interopRequireDefault(__webpack_require__(/*! ../controllers/auth.controller */ \"./server/controllers/auth.controller.js\"));\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nconst router = _express.default.Router();\n\nrouter.route('/api/users').get(_user.default.list).post(_user.default.create);\nrouter.route('/api/users/:userId').get(_auth.default.requireSignin, _user.default.read).put(_auth.default.requireSignin, _auth.default.hasAuthorization, _user.default.update).delete(_auth.default.requireSignin, _auth.default.hasAuthorization, _user.default.remove);\nrouter.param('userId', _user.default.userByID);\nvar _default = router;\nexports.default = _default;\n\n//# sourceURL=webpack://mern-crud/./server/routes/user.routes.js?");
 
 /***/ }),
 
@@ -86,7 +106,7 @@ eval("\n\nObject.defineProperty(exports, \"__esModule\", ({\n  value: true\n}));
   \**************************/
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("\n\nvar _mongoose = _interopRequireDefault(__webpack_require__(/*! mongoose */ \"mongoose\"));\n\nvar _config = _interopRequireDefault(__webpack_require__(/*! ./../config/config */ \"./config/config.js\"));\n\nvar _express = _interopRequireDefault(__webpack_require__(/*! ./express */ \"./server/express.js\"));\n\nvar _user = _interopRequireDefault(__webpack_require__(/*! ./routes/user.routes */ \"./server/routes/user.routes.js\"));\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nconst {\n  MONGOURI\n} = __webpack_require__(/*! ./keys */ \"./server/keys.js\");\n\n_express.default.listen(_config.default.port, err => {\n  if (err) {\n    console.log(err);\n  }\n\n  console.info('Server started on port %s', _config.default.port);\n});\n\n_mongoose.default.connect(MONGOURI, {\n  useNewUrlParser: true,\n  useUnifiedTopology: true\n});\n\n_mongoose.default.connection.on('connected', () => {\n  console.log('Conectado a Mongo');\n});\n\n_mongoose.default.connection.on('error', err => {\n  console.log('error ', err);\n});\n\n_express.default.use('/', _user.default);\n\n//# sourceURL=webpack://mern-crud/./server/server.js?");
+eval("\n\nvar _mongoose = _interopRequireDefault(__webpack_require__(/*! mongoose */ \"mongoose\"));\n\nvar _config = _interopRequireDefault(__webpack_require__(/*! ./../config/config */ \"./config/config.js\"));\n\nvar _express = _interopRequireDefault(__webpack_require__(/*! ./express */ \"./server/express.js\"));\n\nvar _user = _interopRequireDefault(__webpack_require__(/*! ./routes/user.routes */ \"./server/routes/user.routes.js\"));\n\nvar _auth = _interopRequireDefault(__webpack_require__(/*! ./routes/auth.routes */ \"./server/routes/auth.routes.js\"));\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nconst {\n  MONGOURI\n} = __webpack_require__(/*! ./keys */ \"./server/keys.js\");\n\n_express.default.listen(_config.default.port, err => {\n  if (err) {\n    console.log(err);\n  }\n\n  console.info('Server started on port %s', _config.default.port);\n});\n\n_mongoose.default.connect(MONGOURI, {\n  useNewUrlParser: true,\n  useUnifiedTopology: true\n});\n\n_mongoose.default.connection.on('connected', () => {\n  console.log('Conectado a Mongo');\n});\n\n_mongoose.default.connection.on('error', err => {\n  console.log('error ', err);\n});\n\n_express.default.use('/', _user.default);\n\n_express.default.use('/', _auth.default);\n\n//# sourceURL=webpack://mern-crud/./server/server.js?");
 
 /***/ }),
 
@@ -150,6 +170,16 @@ module.exports = require("express");;
 
 /***/ }),
 
+/***/ "express-jwt":
+/*!******************************!*\
+  !*** external "express-jwt" ***!
+  \******************************/
+/***/ ((module) => {
+
+module.exports = require("express-jwt");;
+
+/***/ }),
+
 /***/ "helmet":
 /*!*************************!*\
   !*** external "helmet" ***!
@@ -157,6 +187,16 @@ module.exports = require("express");;
 /***/ ((module) => {
 
 module.exports = require("helmet");;
+
+/***/ }),
+
+/***/ "jsonwebtoken":
+/*!*******************************!*\
+  !*** external "jsonwebtoken" ***!
+  \*******************************/
+/***/ ((module) => {
+
+module.exports = require("jsonwebtoken");;
 
 /***/ }),
 
