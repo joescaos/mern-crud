@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 const { MONGOURI } = require('./keys')
 import config from './../config/config'
 import app from './express'
+import userRoutes from './routes/user.routes'
 
 app.listen(config.port, (err) => {
     if(err){
@@ -22,3 +23,5 @@ mongoose.connect(MONGOURI, {
   mongoose.connection.on('error', (err) => {
     console.log('error ', err)
   })
+
+  app.use('/', userRoutes)
