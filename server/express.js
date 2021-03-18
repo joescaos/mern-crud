@@ -5,10 +5,13 @@ import compress from 'compression'
 import cors from 'cors'
 import helmet from 'helmet'
 import Template from './../template'
+import devBundle from './devBundle'
+import path from 'path'
 
 
 
 const app = express()
+devBundle.compile(app)
 /*... configure express ... */
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
@@ -29,5 +32,8 @@ app.use((err, req, res, next) => {
         console.log(err)
     }
 })
+
+const CURRENT_WORKING_DIR = process.cwd()
+app.use('/dist', express.static(path.join(CURRENT_WORKING_DIR, 'dist')))
 
 export default app
