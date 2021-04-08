@@ -5,6 +5,7 @@ import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
 import unicornbikeImg from "./../assets/images/unicornbikeimg.jpg";
+import { Link } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -40,6 +41,9 @@ export default function Home() {
           Bienvenido a la página principal del proyecto MERN.
         </Typography>
       </CardContent>
+      <Link to="/users">Usuarios</Link>
+      <br />
+      <Link to="/signup">Registrarse</Link>
     </Card>
   );
 }
