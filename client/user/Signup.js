@@ -98,6 +98,7 @@ export default function Signup() {
           <br />
           <TextField
             id="password"
+            type="password"
             label="Constraseña"
             className={classes.textField}
             value={values.password}
@@ -108,7 +109,7 @@ export default function Signup() {
           {values.error && (
             <Typography component="p" color="error">
               <Icon color="error" className={classes.error}>
-                Error
+                error
               </Icon>
               {values.error}
             </Typography>

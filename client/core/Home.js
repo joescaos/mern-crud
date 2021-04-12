@@ -44,6 +44,8 @@ export default function Home() {
       <Link to="/users">Usuarios</Link>
       <br />
       <Link to="/signup">Registrarse</Link>
+      <br />
+      <Link to="/signin">Iniciar Sesión</Link>
     </Card>
   );
 }

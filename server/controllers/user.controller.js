@@ -8,7 +8,7 @@ const create = async (req, res) => {
     try {
         await user.save()
         return res.status(200).json({
-            message: 'Successfully signed up!'
+            message: 'Usuario creado correctamente!'
         })
     } catch(err) {
         return res.status(400).json({
@@ -33,13 +33,13 @@ const userByID = async (req, res, next, id) => {
         let user = await User.findById(id)
         if(!user)
             return res.status(400).json({
-                error: 'User not found'
+                error: 'Usuario no encontrado'
             })
             req.profile = user
             next()
     } catch(err) {
         return res.status(400).json({
-            error: "Could not retrieve the user"
+            error: "No se pudo recuperar usuario"
         })
     }
 }
