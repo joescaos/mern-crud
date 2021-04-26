@@ -1,64 +1,57 @@
-import React from "react";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import HomeIcon from "@material-ui/icons/Home";
-import Button from "@material-ui/core/Button";
-import auth from "./../auth/auth-helper";
-import { Link, withRouter } from "react-router-dom";
+import React from 'react'
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
+import IconButton from '@material-ui/core/IconButton'
+import HomeIcon from '@material-ui/icons/Home'
+import Button from '@material-ui/core/Button'
+import auth from './../auth/auth-helper'
+import {Link, withRouter} from 'react-router-dom'
 
 const isActive = (history, path) => {
-  if (history.location.pathname == path) return { color: "#ff4081" };
-  else return { color: "#ffffff" };
-};
-
-const Menu = withRouter(({ history }) => {
+  if (history.location.pathname == path)
+    return {color: '#ff4081'}
+  else
+    return {color: '#ffffff'}
+}
+const Menu = withRouter(({history}) => (
   <AppBar position="static">
     <Toolbar>
       <Typography variant="h6" color="inherit">
-        MERN CRUD
+        MERN Skeleton
       </Typography>
       <Link to="/">
-        <IconButton aria-label="Inicio" style={isActive(history, "/")}>
-          <HomeIcon />
+        <IconButton aria-label="Home" style={isActive(history, "/")}>
+          <HomeIcon/>
         </IconButton>
       </Link>
       <Link to="/users">
-        <Button style={isActive(history, "/users")}>Usuarios</Button>
+        <Button style={isActive(history, "/users")}>Usarios</Button>
       </Link>
-      {!auth.isAuthenticated() && (
-        <span>
+      {
+        !auth.isAuthenticated() && (<span>
           <Link to="/signup">
-            <Button style={isActive(history, "/signup")}>Registrarse</Button>
-          </Link>
-          <Link to="/sigin">
-            <Button style={isActive(history, "/signin")}>Iniciar Sesión</Button>
-          </Link>
-        </span>
-      )}
-      {auth.isAuthenticated() && (
-        <span>
-          <Link to={"/user/" + auth.isAuthenticated().user._id}>
-            <Button
-              style={isActive(
-                history,
-                "/user/" + auth.isAuthenticated().user._id
-              )}
-            >
-              Mi Perfil
+            <Button style={isActive(history, "/signup")}>Registrarse
             </Button>
           </Link>
-          <Button
-            color="inherit"
-            onClick={() => {
-              auth.clearJWT(() => history.push("/"));
-            }}
-          >Salir</Button>
-        </span>
-      )}
+          <Link to="/signin">
+            <Button style={isActive(history, "/signin")}>Ingresar
+            </Button>
+          </Link>
+        </span>)
+      }
+      {
+        auth.isAuthenticated() && (<span>
+          <Link to={"/user/" + auth.isAuthenticated().user._id}>
+            <Button style={isActive(history, "/user/" + auth.isAuthenticated().user._id)}>Mi Perfil</Button>
+          </Link>
+          <Button color="inherit" onClick={() => {
+              auth.clearJWT(() => history.push('/'))
+            }}>Salir</Button>
+        </span>)
+      }
     </Toolbar>
-  </AppBar>;
-});
+  </AppBar>
+))
 
-export default Menu;
+export default Menu
